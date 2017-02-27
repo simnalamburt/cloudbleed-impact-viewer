@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+require 'sinatra'
+require 'tilt/erubis'
+
+TAG = open('sorted_unique_cf.txt')
+  .map do |line|
+    host = line.chomp
+    "<a href=\"http://#{host}\"></a><a href=\"https://#{host}\"></a>"
+  end
+  .join()
+
+get '/' do
+  erb :index
+end
+
+__END__
+@@index
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Cloudbleed</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    a {
+      width: 1px;
+      height: 1px;
+    }
+
+    :link { background-color: #ffffcd; }
+    :visited { background-color: black; }
+  </style>
+</head>
+<body><%= TAG %></body>
+</html>
