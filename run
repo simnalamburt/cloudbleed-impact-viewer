@@ -1,21 +1,11 @@
-#!/usr/bin/env ruby
-# frozen_string_literal: true
-require 'sinatra'
-require 'tilt/erubis'
+#!/usr/bin/env node
+const process = require("process");
+const fs = require("fs");
+const http = require("http");
 
-TAG = open('sorted_unique_cf.txt')
-  .map do |line|
-    host = line.chomp
-    "<a href=\"http://#{host}\"></a><a href=\"https://#{host}\"></a>"
-  end
-  .join()
+process.stdout.write('Starting server ... ');
 
-get '/' do
-  erb :index
-end
-
-__END__
-@@index
+const html = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -37,5 +27,23 @@ __END__
     :visited { background-color: black; }
   </style>
 </head>
-<body><%= TAG %></body>
+<body>${fs
+  .readFileSync("sorted_unique_cf.txt", "utf8")
+  .split("\n")
+  .map((host) => `<a href="https://${host}"></a>`)
+  .join('')}</body>
 </html>
+`;
+
+http
+  .createServer((req, res) => {
+    res.writeHead(200, { "Content-Type": "text/html" });
+    res.end(html, "utf-8");
+    console.log('request: ', req.url);
+  })
+  .listen(4567);
+
+console.log(`done!
+
+See http://localhost:4567
+`);
